@@ -27,9 +27,9 @@ mongoClient.connect(url,function(err, db) {
     //     console.log("all documents are removed!") 
     // })
 
-    db.collection('users').insertMany(allusers,function(err,result) {
+    // db.collection('users').insertMany(allusers,function(err,result) {
 
-    });
+    // });
 
     const port = 8000;
     const host = '127.0.0.1';
