@@ -2,7 +2,6 @@ const express   = require('express');
 const mongo     = require('mongodb');
 var util        = require('util');
 var bodyParser  = require('body-parser');
-var path        = require('path');
 
 var ObjectId = mongo.ObjectID;
 const mongoClient    = mongo.MongoClient;
@@ -10,7 +9,6 @@ const app            = express();
 
 var url = "mongodb://localhost:27017/db"
 
-// app.use(express.favicon());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 

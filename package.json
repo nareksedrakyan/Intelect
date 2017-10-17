@@ -1,0 +1,24 @@
+{
+  "name": "intelect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nareksedrakyan/Intelect.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nareksedrakyan/Intelect/issues"
+  },
+  "homepage": "https://github.com/nareksedrakyan/Intelect#readme",
+  "dependencies": {
+    "express": "",
+    "mongodb": "",
+    "mongoose": ""
+  }
+}
