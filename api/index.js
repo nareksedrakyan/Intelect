@@ -2,6 +2,8 @@ const express   = require('express');
 const mongo     = require('mongodb');
 var util        = require('util');
 var bodyParser  = require('body-parser');
+var config      = require('../config');
+var log         = require('../libs/log')(module);
 
 var ObjectId = mongo.ObjectID;
 const mongoClient    = mongo.MongoClient;
@@ -9,13 +11,16 @@ const app            = express();
 
 var url = "mongodb://localhost:27017/db"
 
+// app.set('port',config.get('port'));
+// app.set('host',config.get('host'));
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 mongoClient.connect(url,function(err, db) {
     if (err) throw err;
 
-    console.log("Database created!");
+    log.info('Database created!');
     // db.createCollection("users",function(err,res) {
     //     if (err) throw err;
     //     console.log("collection created") 
@@ -30,12 +35,11 @@ mongoClient.connect(url,function(err, db) {
     // db.collection('users').insertMany(allusers,function(err,result) {
 
     // });
-
-    const port = 8000;
-    const host = '127.0.0.1';
-    var userOptions = {password:false};    
-    app.listen(port,host,function() {
-        console.log('We are live on ' + port);
+    var userOptions = {password:false};
+    
+    
+    app.listen(config.get('port'), config.get('host'), function() {
+        log.info('We are live on ' + config.get('port'));
     });
     
     app.get('/users',function(request,response) {
