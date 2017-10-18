@@ -19,7 +19,6 @@ app.use(bodyParser.json());
 
 mongoClient.connect(url,function(err, db) {
     if (err) throw err;
-
     log.info('Database created!');
     // db.createCollection("users",function(err,res) {
     //     if (err) throw err;
