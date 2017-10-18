@@ -14,6 +14,7 @@ var url = "mongodb://localhost:27017/db"
 // app.set('port',config.get('port'));
 // app.set('host',config.get('host'));
 
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
