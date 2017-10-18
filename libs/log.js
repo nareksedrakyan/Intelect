@@ -1,5 +1,5 @@
 var winston = require('winston');
-var ENV = process.env.NODE_ENV;
+var ENV     = process.env.NODE_ENV;
 
 function getLogger(module) {
     var path = module.filename.split('/').slice(-2).join('/');
