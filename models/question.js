@@ -19,7 +19,10 @@ var questionSchema = new Schema({
                         total:      { type: Number ,default: 0 },
                         correctly:  { type: Number ,default: 0 },
                     },
-    category : { type: String, enum: CATEGORIES, required:true },
+    category:       {
+                        type:       { type: String, enum: CATEGORIES, required:true },
+                        subType:    { type: String, default:null }  // category type creted by user 
+                    } ,
     createdAt:      { type: String },
     updatedAt:      { type: String },
 })

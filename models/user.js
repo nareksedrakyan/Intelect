@@ -1,5 +1,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
+var POSITIONS = ['newbie','amateur','expert','master'];
 
 var userSchema = new Schema({
     userName:       { type: String, required: true, unique: true },
@@ -7,6 +8,7 @@ var userSchema = new Schema({
     lastName:       { type: String, required: true },
     password:       { type: String, required: true },
     score:          { type: Number, default: 0 },
+    position:       { type: String, enum: POSITIONS ,default: ''},
     photoUrl:       { type: String },
     questionIds:    { type: Array[Schema.Types.ObjectId] },
     admin:          { type: Boolean, default: false },
