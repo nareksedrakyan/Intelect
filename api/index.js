@@ -4,6 +4,9 @@ var bodyParser = require('body-parser');
 var config = require('../libs/config');
 var mongoose = require('../libs/mongoose');
 
+var User = require('../models/user');
+var Question = require('../models/question');
+
 var router = express.Router(); 
 var app = express();
 
@@ -16,92 +19,105 @@ app.listen(config.get('port'), config.get('host'), function() {
     console.log('We are live on ' + config.get('port'));
 });
 
-router.get('/', function(req, res) {
-    res.status(200).json({ message: 'hooray! welcome to our api!' });   
+router.get('/', function(request, response) {
+    response.status(200).json({ message: 'hooray! welcome to our api!' });   
 });
 
 
-// mongoClient.connect(url,function(err, db) {
-//     if (err) throw err;
-//     log.info('Database created!');
-//     // db.createCollection("users",function(err,res) {
-//     //     if (err) throw err;
-//     //     console.log("collection created") 
-//     // })
-//     // db.close();
+router.route('/signup')
+    .post(function(request, response) {
+        var user = new User(request.body);
+        user.save(function(err,user1) {
+            if (err) {
+                response.status(404).json(err.message);
+            }
+            response.status(200).json(user);
+        })
+    })
 
-//     // db.collection('users').remove({}, function(err,result) {
-//     //     if (err) throw err;
-//     //     console.log("all documents are removed!") 
-//     // })
+router.route('/signin')
+    .post(function(request, response) {
+        
+    })
 
-//     // db.collection('users').insertMany(allusers,function(err,result) {
+router.route('/users')
+    .get(function(request, response) {
+        User.find(function(err, users) {
+           if (err) {
+            response.status(404).json(err);
+           } 
+           response.status(200).json(users);
+        })
+    })
 
-//     // });
-//     var userOptions = {password:false};
+router.route('/users/:id')
+    .get(function(request, response) {
+        User.findById(request.params.id, function(err, user) {
+            if (err) {
+                response.status(404).json(error);
+            }
+            response.status(200).json(user);
+        })
+    })
+
+    .put(function(request, response) {
+        User.findByIdAndUpdate(request.params.id, request.body, function(err, user) {
+            if (err) {
+                response.status(404).json(error);
+            }
+            response.status(200).json(user);
+        })
+    })
+
+    .delete(function(request, response) {
+        User.findByIdAndRemove(request.params.id, function(err) {
+            if (err) {
+                response.status(404).json(err);
+            }
+            response.status(200).json({ message: 'user successfully deleted' });
+        })
+    })
     
     
-    
-    
-//     app.get('/users',function(request,response) {
-//         db.collection('users').find({},userOptions).toArray(function(err,result){
-//             if (err) throw err;
-//             response.status(200).json(result);
-//         })
-//     })
+router.route('/create_question')
+    .post(function(request, response) {
 
-//     app.get('/users/:id',function(request,response) {
-//         var query = { _id: ObjectId(request.params.id) };
-//         db.collection('users').findOne(query,userOptions, function(err,result) {
-//             if (err) throw err;
-//             response.status(200).json(result);
-//         });
-//     })
+    })
 
-//     app.post('/register',function(request,response) {
-//         var user = request.body;
-//         db.collection('users').findOne({'userName':user.userName},userOptions,function(err,result) {
-//             if (result) {
-//                response.status(500).json({"message": "this username is busy"}) 
-//             } else {
-//                 db.collection('users').insertOne(user,userOptions,function(err,result) {
-//                     if (err) throw err;
-//                     delete user.password;
-//                     response.status(200).json(user);
-//                 })
-//             }
-//         })
-//     })
+router.route('/questions')
+    .get(function(request, response) {
+        Question.find(function(err, questions) {
+           if (err) {
+            response.status(404).json(error);
+           } 
+           response.status(200).json(questions);
+        })
+    })
 
-//     app.post('/login',function(request,response) {
-//         var query = request.body;
-//         db.collection('users').findOne(query,userOptions,function(err,result) {
-//             if (err) {
-//                 throw err;
-//             } else {
-//                 console.log(result);
-//                 if (result) {
-//                     response.status(200).json(query);                   
-//                 } else {
-//                     response.status(500).json({"message":"incorrect login or password"});                    
-//                 }
-//             }
-//         })
-//     })
+router.route('/questions/:id')
+    .get(function(request, response) {
+        Question.findById(request.params.id, function(err, question) {
+            if (err) {
+                response.status(404).json(error);
+            }
+            response.status(200).json(question);
+        })
+    })
 
-//     // questions
+    .put(function(request, response) {
+        Question.findByIdAndUpdate(request.params.id, request.body, function(err, question) {
+            if (err) {
+                response.status(404).json(error);
+            }
+            response.status(200).json(question);
+        })
+    })
 
-//     app.get('/questions',function(req,res){
-//         res.send('all questions');
-//     })
-
-//     app.get('/questions/:page',function(req,res){
-//         res.send(util.format('questions N%d',req.params.page));
-//     })
-
-//     //next page
-
-//     app.post('/next',function(req,res) {
-//         var user = req.body;
-//     })
-// })
+    .delete(function(request, response) {
+        Question.findByIdAndRemove(request.params.id, function(err) {
+            if (err) {
+                response.status(404).json(err);
+            }
+            response.status(200).json({ message: 'question successfully deleted' });
+        })
+    })

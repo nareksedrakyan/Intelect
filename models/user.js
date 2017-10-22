@@ -6,17 +6,17 @@ var userSchema = new Schema({
     userName:       { type: String, required: true, unique: true },
     firstName:      { type: String, required: true },
     lastName:       { type: String, required: true },
-    password:       { type: String, required: true },
+    password:       { type: String, required: true , select: false },
     score:          { type: Number, default: 0 },
-    position:       { type: String, enum: POSITIONS ,default: ''},
+    position:       { type: String, enum: POSITIONS ,default: 'newbie'},
     photoUrl:       { type: String },
-    questionIds:    { type: Array[Schema.Types.ObjectId] },
+    questionIds:    { type: [Schema.Types.ObjectId] ,default: [] },
     admin:          { type: Boolean, default: false },
     vip:            { type: Boolean, default: false },
     location:       { type: String, required: true },
     createdAt:      { type: String },
     updatedAt:      { type: String },
-    accessToken:    { type: String, default: null, unique: true }
+    accessToken:    { type: String, default: null}
 })
 
 userSchema.pre('save', function (next) {
@@ -29,4 +29,5 @@ userSchema.pre('save', function (next) {
 })
 
 var User = mongoose.model('User', userSchema);
+
 module.exports = User;
