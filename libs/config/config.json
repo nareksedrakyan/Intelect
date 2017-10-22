@@ -1,0 +1,10 @@
+{
+    "port": 8000,
+    "host": "localhost",
+    "mongoose": {
+        "uri": "mongodb://localhost:27017/db",
+        "options": {
+            "useMongoClient": true
+        }
+    }
+}
