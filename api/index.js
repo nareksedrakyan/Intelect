@@ -22,9 +22,7 @@ app.listen(config.get('port'), config.get('host'), function() {
 router.get('/', function(request, response) {
     response.json({ message: 'hooray! welcome to our api!' });   
 });
-
-// Users
-
+// USERS
 router.route('/signup')
     .post(function(request, response) {
         var user = new User(request.body);
@@ -84,8 +82,7 @@ router.route('/users/:id')
         })
     })
  
-// questions
-    
+// QUESTIONS
 router.route('/create_question')
     .post(function(request, response) {
         var question = new Question(request.body);
@@ -95,13 +92,25 @@ router.route('/create_question')
             }
             response.json(question);
         })
+
+        User.findById(question.authorId, function(findError, author) {
+            if (findError) {
+                return response.status(404).json(findError.message);
+            }
+            author.questionIds.push(question._id)
+            author.save(function(saveError) {
+                if (saveError) {
+                    return response.status(404).json(saveError.message);
+                }
+            })
+        })
     })
 
 router.route('/questions')
     .get(function(request, response) {
         Question.find(function(err, questions) {
            if (err) {
-            return response.status(404).json(error);
+            return response.status(404).json(err.message);
            } 
            response.json(questions);
         })
@@ -134,3 +143,78 @@ router.route('/questions/:id')
             response.json({ message: 'question successfully deleted' });
         })
     })
+
+// GET NEXT QUESTION   
+router.route('/next_question')
+    .post(function(request, response) {
+
+        var excludedQuestionIds = request.body.excludedQuestionIds;
+        if (!excludedQuestionIds) {
+            excludedQuestionIds = [];
+        }
+
+        var userId = request.body.userId;
+
+        var questionId = request.body.questionId;
+        var answerResult = request.body.result;
+    
+        User.findById(userId, function(error, user) {
+            if (error) {
+                return response.status(404).json(error);
+            }
+            Question.findById(questionId, function(questionFindError, question) {
+                if (questionFindError) {
+                    return response.status(404).json(questionFindError);
+                }
+                
+                question.answered.total++;
+                question.answered.correctly += answerResult ? 1 : 0;
+                question.save((function(questionSaveError) {
+                    if (questionSaveError) {
+                       return response.status(404).json(questionSaveError.message);
+                    }
+                }))
+
+                user.score += answerResult ? question.score : 0;
+                user.save((function(userSaveError) {
+                    if (userSaveError) {
+                       return response.status(404).json(userSaveError.message);
+                    }
+                }))
+            })
+        })
+
+        Question.find({ _id: { $nin :excludedQuestionIds } }, function(questionsFindError, questions) {
+            if (questionsFindError) {
+                return response.status(404).json(questionsFindError.message);
+            } else if (questions.count == 0) {
+                return response.json({ message: 'questions are over' });
+            }
+            var randomIndex = getRandomInt(0, questions.length - 1);
+            var randomQuestion = questions[randomIndex];
+            response.json(randomQuestion);
+        })
+    })
+    
+    router.route('/first_question')
+    .post(function(request, response) {
+        var excludedQuestionIds = request.body.excludedQuestionIds;
+        if (!excludedQuestionIds) {
+            excludedQuestionIds = [];
+        }
+        
+        Question.find({ _id: { $nin :excludedQuestionIds } }, function(questionsFindError, questions) {
+            if (questionsFindError) {
+                return response.status(404).json(questionsFindError.message);
+            } else if (questions.count == 0) {
+                return response.json({ message: 'questions are over' });
+            }
+            var randomIndex = getRandomInt(0, questions.length - 1);
+            var randomQuestion = questions[randomIndex];
+            response.json(randomQuestion);
+        })
+    })
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}

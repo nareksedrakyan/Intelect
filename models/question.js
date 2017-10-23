@@ -11,7 +11,7 @@ var variantSchema = new Schema({
 
 var questionSchema = new Schema({
     description:    { type: String, required: true, unique: true },
-    authorId:       { type: Schema.Types.ObjectId, default: null },
+    authorId:       { type: Schema.Types.ObjectId, required: true },
     score:          { type: Number, enum:[100, 150, 200], default: 100 },
     variants:       { type: [variantSchema], required: true},
     answer:         { type: variantSchema, required: true},
