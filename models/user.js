@@ -16,7 +16,7 @@ var userSchema = new Schema({
     location:       { type: String, required: true },
     createdAt:      { type: String },
     updatedAt:      { type: String },
-    accessToken:    { type: String, default: null}
+    accessToken:    { type: String, default: null }
 })
 
 userSchema.pre('save', function (next) {
