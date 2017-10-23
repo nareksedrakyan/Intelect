@@ -27,7 +27,7 @@ router.get('/', function(request, response) {
 router.route('/signup')
     .post(function(request, response) {
         var user = new User(request.body);
-        user.save(function(err,user1) {
+        user.save(function(err) {
             if (err) {
                 response.status(404).json(err.message);
             }
