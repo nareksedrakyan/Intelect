@@ -4,9 +4,7 @@ var Schema = mongoose.Schema;
 const CATEGORIES = ['Other','Sport','Mathematics','History','Geography','Literature','Chemistry','Physics','Art'];
 
 var variantSchema = new Schema({
-    id:          { type: Schema.Types.ObjectId },
-    description: { type: String, required: true },
-    _id: false
+    description: { type: String, required: true }
 })
 
 var questionSchema = new Schema({
@@ -30,11 +28,9 @@ var questionSchema = new Schema({
 questionSchema.pre('save', function (next) {
 
     this.variants.forEach((variant) => {
-        if (!variant.id) {
-            variant.id = mongoose.Types.ObjectId();
-        }
-        if((!this.answer.id) && (this.answer.description == variant.description)) {
-            this.answer.id = variant.id;
+
+        if((this.answer._id != variant._id) && (this.answer.description == variant.description)) {
+            this.answer._id = variant._id;
         }
       });
     var currentDate = new Date();
