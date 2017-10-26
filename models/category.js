@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var categorySchema = new Schema({
-    authorId:   { type: Schema.Types.ObjectId, required: true },
+    author:   { type: Schema.Types.ObjectId, required: true, ref:'User' },
     type:       { type: String, required:true },
     subType:    { type: String, default:null } ,
     createdAt:      { type: String },

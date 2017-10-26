@@ -6,6 +6,9 @@ var mongoose = require('../libs/mongoose');
 
 var User = require('../models/user');
 var Question = require('../models/question');
+var Category = require('../models/category');
+var Quiz = require('../models/gameModels/quiz');
+
 
 var router = express.Router(); 
 var app = express();
@@ -218,3 +221,80 @@ router.route('/next_question')
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+
+
+
+
+
+
+
+// USERS
+router.route('/quiz_create')
+.post(function(request, response) {
+    var quiz = new Quiz(request.body);
+    quiz.save(function(err) {
+        if (err) {
+           return response.status(404).json(err.message);
+        }
+        
+        if (quiz.mode == 'Categorized') {
+            Category.find().populate('author'). exec(function (err, categories) {
+                if (err) {
+                 return response.status(404).json(err);
+                } 
+                response.json({ "quiz": quiz,"categories": categories});
+             })
+        } else {
+            response.json(quiz);
+        }
+    })
+})
+
+router.route('/quiz_start')
+.post(function(request, response) {
+    var user = User.findOne({ userName:request.body.userName, password:request.body.password }, function(err, user) {
+        if (err) {
+            return response.status(404).json(err.message);
+        }  
+        response.json(user);
+    })
+})
+
+router.route('/users')
+.get(function(request, response) {
+    User.find(function(err, users) {
+       if (err) {
+        return response.status(404).json(err);
+       } 
+       response.json(users);
+    })
+})
+
+router.route('/users/:id')
+.get(function(request, response) {
+    User.findById(request.params.id, function(err, user) {
+        if (err) {
+            return response.status(404).json(error);
+        }
+        response.json(user);
+    })
+})
+
+.put(function(request, response) {
+    User.findByIdAndUpdate(request.params.id, request.body,{new: true}, function(err, user) {
+        if (err) {
+            return response.status(404).json(error);
+        }
+        response.json(user);
+    })
+})
+
+.delete(function(request, response) {
+    User.findByIdAndRemove(request.params.id, function(err) {
+        if (err) {
+            return response.status(404).json(err);
+        } 
+        response.json({ message: 'user successfully deleted' });
+    })
+})
