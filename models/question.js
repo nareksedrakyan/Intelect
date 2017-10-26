@@ -9,7 +9,7 @@ var variantSchema = new Schema({
 
 var questionSchema = new Schema({
     description:    { type: String, required: true, unique: true },
-    authorId:       { type: Schema.Types.ObjectId, required: true },
+    author:         { type: Schema.Types.ObjectId, required: true , ref: 'User' },
     score:          { type: Number, enum:[100, 150, 200], default: 100 },
     variants:       { type: [variantSchema], required: true},
     answer:         { type: variantSchema, required: true},
@@ -17,10 +17,7 @@ var questionSchema = new Schema({
                         total:      { type: Number ,default: 0 },
                         correctly:  { type: Number ,default: 0 },
                     },
-    category:       {
-                        type:       { type: String, enum: CATEGORIES, required:true },
-                        subType:    { type: String, default:null }  // category type creted by user 
-                    } ,
+    category:       { type: Schema.Types.ObjectId, required: true , ref: 'Category' } ,
     createdAt:      { type: String },
     updatedAt:      { type: String }
 })

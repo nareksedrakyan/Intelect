@@ -1,16 +1,10 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-var subGameSchema = new Schema({
-    user:        { type: Schema.Types.ObjectId, ref:'User' },
-    startedAt:   { type: String },
-    endedAt:     { type: String }
-})
 
-var gameSchema = new Schema({
-    subGame:    [ { type: subGameSchema, required: true} ],
+var QuizSchema = new Schema({
+    user:        { type: Schema.Types.ObjectId, ref:'User' },
     mode:        { type: String, enum:[ 'Categorized','Mixed' ] },
-    type:        { type: String, enum:[ 'Single','Duel','Tournament','Playoff' ] },
     createdAt:   { type: String },
     updatedAt:   { type: String },    
     startedAt:   { type: String },
@@ -26,6 +20,6 @@ gameSchema.pre('save', function (next) {
     next();
 })
 
-var Game = mongoose.model('Game', sessionSchema);
+var Quiz = mongoose.model('Quiz', QuizSchema);
 
 module.exports = Game;
