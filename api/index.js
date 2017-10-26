@@ -23,7 +23,7 @@ app.listen(config.get('port'), config.get('host'), function() {
 });
 
 router.get('/', function(request, response) {
-    response.json({ message: 'hooray! welcome to our api!' });   
+    response.json({ message: 'hooray! welcome toj our api!' });   
 });
 // USERS
 router.route('/signup')

@@ -18,6 +18,6 @@ categorySchema.pre('save', function (next) {
     next();
 })
 
-var category = mongoose.model('Category', sessionSchema);
+var category = mongoose.model('Category', categorySchema);
 
-module.exports = Session;
+module.exports = category;
