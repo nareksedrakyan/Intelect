@@ -8,6 +8,7 @@ var DuelSchema = new Schema({
     winner:        { type: Schema.Types.ObjectId, ref:'User' },
     games:        [{ type: GameSchema, required: true }],
     roundCount:    { type: Number , default: 10 },
+    questions:    [{ type: Schema.Types.ObjectId, ref:'Question' }],
     createdAt:     { type: String },
     updatedAt:     { type: String },    
     startedAt:     { type: String },
