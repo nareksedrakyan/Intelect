@@ -22,6 +22,7 @@ var userSchema = new Schema({
                         }],
     admin:              { type: Boolean, default: false },
     vip:                { type: Boolean, default: false },
+    online:             { type:Boolean, default: false },
     location:           { type: String, required: true },
     createdAt:          { type: String },
     updatedAt:          { type: String },
