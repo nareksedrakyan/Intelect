@@ -2,7 +2,7 @@
     "port": 8080,
     "host": "http://nsintelect.com",
     "mongoose": {
-        "uri": "mongodb://localhost:27017/db",
+        "uri": "mongodb://admin:admin@ds237445.mlab.com:37445/intelect",
         "options": {
             "useMongoClient": true
         }
