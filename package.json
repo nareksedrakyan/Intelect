@@ -27,6 +27,7 @@
     "mongoose": "",
     "nconf": "",
     "optimist": "",
-    "winston": ""
+    "winston": "",
+    "node-geocoder": ""
   }
 }
