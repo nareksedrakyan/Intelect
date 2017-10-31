@@ -26,7 +26,8 @@ router.get('/', function(request, response) {
     response.json({ message: 'hooray! welcome toj our api!' });   
 });
 // USERS
-router.route('users/signup')
+router.route('/users/signup')
+
     .post(function(request, response) {
         var user = new User(request.body);
         user.save(function(err) {
@@ -37,7 +38,7 @@ router.route('users/signup')
         })
     })
 
-router.route('users/signin')
+router.route('/users/signin')
     .post(function(request, response) {
         var user = User.findOne({ userName:request.body.userName, password:request.body.password }, function(err, user) {
             if (err) {
