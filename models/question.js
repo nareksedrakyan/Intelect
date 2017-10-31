@@ -17,7 +17,7 @@ var questionSchema = new Schema({
                         total:      { type: Number ,default: 0 },
                         correctly:  { type: Number ,default: 0 },
                     },
-    category:       { type: Schema.Types.ObjectId, required: true , ref: 'Category' } ,
+    topic:          { type: Schema.Types.ObjectId, required: true , ref: 'Topic' } ,
     createdAt:      { type: String },
     updatedAt:      { type: String }
 })
@@ -25,7 +25,6 @@ var questionSchema = new Schema({
 questionSchema.pre('save', function (next) {
 
     this.variants.forEach((variant) => {
-
         if((this.answer._id != variant._id) && (this.answer.description == variant.description)) {
             this.answer._id = variant._id;
         }

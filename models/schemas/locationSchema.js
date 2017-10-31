@@ -8,6 +8,6 @@ var LocationSchema = new Schema({
     countryCode: { type: String ,default: null },
     city:        { type: String ,default: null },
     zipcode:     { type: String ,default: null }
-})
+},{ _id: false })
 
 module.exports = LocationSchema;

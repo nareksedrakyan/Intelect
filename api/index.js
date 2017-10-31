@@ -6,7 +6,7 @@ var mongoose = require('../libs/mongoose');
 
 var User = require('../models/user');
 var Question = require('../models/question');
-var Category = require('../models/category');
+var Topic = require('../models/topic');
 var Quiz = require('../models/gameModels/quiz');
 
 
@@ -26,7 +26,7 @@ router.get('/', function(request, response) {
     response.json({ message: 'hooray! welcome toj our api!' });   
 });
 // USERS
-router.route('/signup')
+router.route('users/signup')
     .post(function(request, response) {
         var user = new User(request.body);
         user.save(function(err) {
@@ -37,7 +37,7 @@ router.route('/signup')
         })
     })
 
-router.route('/signin')
+router.route('users/signin')
     .post(function(request, response) {
         var user = User.findOne({ userName:request.body.userName, password:request.body.password }, function(err, user) {
             if (err) {
@@ -68,7 +68,7 @@ router.route('/users/:id')
     })
 
     .put(function(request, response) {
-        User.findByIdAndUpdate(request.params.id, request.body,{new: true}, function(err, user) {
+        User.findByIdAndUpdate(request.params.id, request.body,{ new: true }, function(err, user) {
             if (err) {
                 return response.status(404).json(error);
             }
@@ -239,11 +239,11 @@ router.route('/quiz_create')
         }
         
         if (quiz.mode == 'Categorized') {
-            Category.find().populate('author'). exec(function (err, categories) {
+            Topic.find().populate('author'). exec(function (err, topics) {
                 if (err) {
                  return response.status(404).json(err);
                 } 
-                response.json({ "quiz": quiz,"categories": categories});
+                response.json({ "quiz": quiz,"categories": topics});
              })
         } else {
             response.json(quiz);
