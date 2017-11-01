@@ -36,6 +36,10 @@ router.route('/users/signup')
 
     .post(function(request, response) {
         var user = new User(request.body);
+        if (!validateEmail(user.email)) {
+            var errMessage = 'This email address is not valid';
+            return response.status(404).json(errMessage)
+        }
         if (user.location) {
             geocoder.reverse({ lat:user.location.latitude, lon:user.location.longitude }, function(err, res) {
                 if (err) console.log(err); 
@@ -51,6 +55,11 @@ router.route('/users/signup')
        
     })
 
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
+
 function sendRegisteredUser(user,response) {
     user.save(function(error) {
         if (error) {
@@ -59,8 +68,7 @@ function sendRegisteredUser(user,response) {
                 errMessage = 'An user with this username already exist';
             } else if (error.errors.email && error.errors.email.kind == 'unique') {
                 errMessage = 'An user with this email already exist';
-            }
-
+            };
            return response.status(404).json(errMessage);
         }
         response.json(user);
@@ -72,7 +80,10 @@ router.route('/users/signin')
         var user = User.findOne({ userName:request.body.userName, password:request.body.password }, function(err, user) {
             if (err) {
                 return response.status(404).json(err.message);
-            }  
+            } else if (!user) {
+                var errMessage = 'Username or Password incorrect'
+                return response.status(404).json(errMessage);
+            } 
             response.json(user);
         })
     })

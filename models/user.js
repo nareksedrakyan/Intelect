@@ -28,8 +28,17 @@ var userSchema = new Schema({
     createdAt:          { type: String },
     updatedAt:          { type: String },
     accessToken:        { type: String, default: null }
+})
 
-},{ versionKey: false })
+userSchema.virtual('id')
+    .get(function()   { return this._id; })
+    .set(function(id) { this._id = id; });
+
+userSchema.set('toJSON', {
+    virtuals: true,
+    versionKey:false,
+    transform: function (doc, ret) { delete ret._id  }
+});
 
 userSchema.plugin(uniqueValidator);
 

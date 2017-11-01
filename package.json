@@ -1,7 +1,7 @@
 {
   "name": "intelect",
   "version": "1.0.0",
-  "description": "",
+  "description": "good app",
   "main": "index.js",
   "engines": {
     "node": ">=4.3.2"
@@ -28,6 +28,7 @@
     "nconf": "",
     "optimist": "",
     "winston": "",
-    "node-geocoder": ""
+    "node-geocoder": "",
+    "mongoose-unique-validator": ""
   }
 }
