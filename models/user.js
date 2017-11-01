@@ -1,4 +1,6 @@
 var mongoose = require('mongoose');
+var uniqueValidator = require('mongoose-unique-validator');
+
 var LocationSchema = require('./schemas/locationSchema');
 var Schema = mongoose.Schema;
 var POSITIONS = ['Beginner','Novice','Advanced','Expert','Master','Genius'];
@@ -28,6 +30,8 @@ var userSchema = new Schema({
     accessToken:        { type: String, default: null }
 
 },{ versionKey: false })
+
+userSchema.plugin(uniqueValidator);
 
 userSchema.pre('save', function (next) {
     var currentDate = new Date();

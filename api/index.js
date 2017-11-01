@@ -10,6 +10,12 @@ var Topic = require('../models/topic');
 var Quiz = require('../models/gameModels/quiz');
 
 
+var NodeGeocoder = require('node-geocoder');
+var options = {
+ provider: 'google'
+};
+var geocoder = NodeGeocoder(options);
+
 var router = express.Router(); 
 var app = express();
 
@@ -30,13 +36,36 @@ router.route('/users/signup')
 
     .post(function(request, response) {
         var user = new User(request.body);
-        user.save(function(err) {
-            if (err) {
-               return response.status(404).json(err.message);
-            }
-            response.json(user);
-        })
+        if (user.location) {
+            geocoder.reverse({ lat:user.location.latitude, lon:user.location.longitude }, function(err, res) {
+                if (err) console.log(err); 
+                user.location.country = res[0].country;
+                user.location.countryCode = res[0].countryCode;
+                user.location.city = res[0].city;      
+                user.location.zipcode = res[0].zipcode;
+                sendRegisteredUser(user,response);
+              });
+        } else {
+            sendRegisteredUser(user,response);
+        }
+       
     })
+
+function sendRegisteredUser(user,response) {
+    user.save(function(error) {
+        if (error) {
+            var errMessage = error.message;
+            if (error.errors.userName && error.errors.userName.kind == 'unique') {
+                errMessage = 'An user with this username already exist';
+            } else if (error.errors.email && error.errors.email.kind == 'unique') {
+                errMessage = 'An user with this email already exist';
+            }
+
+           return response.status(404).json(errMessage);
+        }
+        response.json(user);
+    })
+}
 
 router.route('/users/signin')
     .post(function(request, response) {
