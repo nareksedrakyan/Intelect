@@ -3,7 +3,7 @@ var util = require('util');
 var bodyParser = require('body-parser');
 var config = require('../libs/config');
 var mongoose = require('../libs/mongoose');
-
+var path = require('path');
 var User = require('../models/user');
 var Question = require('../models/question');
 var Topic = require('../models/topic');
@@ -23,6 +23,7 @@ var app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use('/api', router);
+app.use('/countries', express.static(path.join(__dirname,'/../public/img')));
 var port = process.env.PORT || 8080;
 app.listen(port, function() {
     console.log('We are live on ' + config.get('port'));
