@@ -16,6 +16,7 @@ var userSchema = new Schema({
     displayName:        { type: String, required: true },
     password:           { type: String, required: true , select: false },
     location:           { type: LocationSchema, required: true },
+    gold:               { type: Number, default: 100 },
     totalRating:        { type: Number, default: 0 },
     position:           { type: String, enum: POSITIONS, default: 'Beginner'},
     photoUrl:           { type: String },
