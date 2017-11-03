@@ -9,8 +9,43 @@ var Question = require('../models/question');
 var Topic = require('../models/topic');
 var Quiz = require('../models/gameModels/quiz');
 
+var jwt = require('jsonwebtoken');        
+var payload = { userName: 'narnar90', password:'politexnik' };
+var options = { algorithm: 'HS256', expiresIn: '2m' };
+var secret = 'secret';
+
+
+
+token1 = jwt.sign(payload, secret, options);
+
+token2 = jwt.sign(payload, secret, options);
+// setTimeout(function() { 
+//     var originalDecoded = jwt.decode(token1);
+//     var refreshed = jwt.refresh(originalDecoded, 3600, secret);
+    
+//     var payload = { userName: 'narnar90', password:'politexnik' };
+//     var options = { algorithm: 'HS256', expiresIn: '2m' };
+//     var secret = 'secret';
+
+//     token2 = jwt.sign(payload, secret, options);
+//  }, 1000);
+
+
+
 
 var NodeGeocoder = require('node-geocoder');
+var multer  = require('multer')
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, './uploads')
+    },
+    filename: function (req, file, cb) {
+      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+  })
+  
+  var upload = multer({ storage: storage })
+
 var options = {
  provider: 'google'
 };
@@ -22,8 +57,9 @@ var app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname,'/../public/')));
 app.use('/api', router);
-app.use('/countries', express.static(path.join(__dirname,'/../public/img')));
+
 var port = process.env.PORT || 8080;
 app.listen(port, function() {
     console.log('We are live on ' + config.get('port'));
@@ -32,6 +68,16 @@ app.listen(port, function() {
 router.get('/', function(request, response) {
     response.json({ message: 'hooray! welcome toj our api!' });   
 });
+
+//Upload
+
+router.route('/avatar')
+    .post(upload.single('image'),function(request, response) {
+        console.log(request.file, 'files');
+
+        response.json("success");
+    });
+
 // USERS
 router.route('/users/signup')
 

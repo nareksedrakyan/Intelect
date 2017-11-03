@@ -29,6 +29,8 @@
     "optimist": "",
     "winston": "",
     "node-geocoder": "",
-    "mongoose-unique-validator": ""
+    "mongoose-unique-validator": "",
+    "multer": "",
+    "jsonwebtoken": ""
   }
 }
