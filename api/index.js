@@ -8,30 +8,9 @@ var User = require('../models/user');
 var Question = require('../models/question');
 var Topic = require('../models/topic');
 var Quiz = require('../models/gameModels/quiz');
-
-var jwt = require('jsonwebtoken');        
-var payload = { userName: 'narnar90', password:'politexnik' };
-var options = { algorithm: 'HS256', expiresIn: '2m' };
+var jwt = require('jsonwebtoken');   
+var bcrypt = require('bcrypt');     
 var secret = 'secret';
-
-
-
-token1 = jwt.sign(payload, secret, options);
-
-token2 = jwt.sign(payload, secret, options);
-// setTimeout(function() { 
-//     var originalDecoded = jwt.decode(token1);
-//     var refreshed = jwt.refresh(originalDecoded, 3600, secret);
-    
-//     var payload = { userName: 'narnar90', password:'politexnik' };
-//     var options = { algorithm: 'HS256', expiresIn: '2m' };
-//     var secret = 'secret';
-
-//     token2 = jwt.sign(payload, secret, options);
-//  }, 1000);
-
-
-
 
 var NodeGeocoder = require('node-geocoder');
 var multer  = require('multer')
@@ -80,9 +59,15 @@ router.route('/avatar')
 
 // USERS
 router.route('/users/signup')
-
     .post(function(request, response) {
-        var user = new User(request.body);
+        var user = new User({
+            userName:request.body.userName,
+            email:request.body.email,
+            displayName:request.body.displayName,
+            password:request.body.password,
+            location:request.body.location
+        });
+
         if (!validateEmail(user.email)) {
             var errMessage = 'This email address is not valid';
             return response.status(404).json(errMessage)
@@ -108,32 +93,74 @@ function validateEmail(email) {
 }
 
 function sendRegisteredUser(user,response) {
-    user.save(function(error) {
-        if (error) {
-            var errMessage = error.message;
-            if (error.errors.userName && error.errors.userName.kind == 'unique') {
-                errMessage = 'An user with this username already exist';
-            } else if (error.errors.email && error.errors.email.kind == 'unique') {
-                errMessage = 'An user with this email already exist';
-            };
-           return response.status(404).json(errMessage);
+    bcrypt.hash(user.password, 10, function(err, hash) {
+        if (!err) {
+            user.password = hash;
+            user.save(function(error) {
+                if (error) {
+                    var errMessage = error.message;
+                    if (error.errors.userName && error.errors.userName.kind == 'unique') {
+                        errMessage = 'An user with this username already exist';
+                    } else if (error.errors.email && error.errors.email.kind == 'unique') {
+                        errMessage = 'An user with this email already exist';
+                    };
+                   return response.status(404).json(errMessage);
+                }
+                response.json(user);
+            })
+        } else {
+            response.status(404).json(err);
         }
-        response.json(user);
-    })
+      });
+    
 }
 
 router.route('/users/signin')
     .post(function(request, response) {
-        var user = User.findOne({ userName:request.body.userName, password:request.body.password }, function(err, user) {
-            if (err) {
-                return response.status(404).json(err.message);
+        var user = User.findOne({ userName:request.body.userName }, function(error, user) {
+            if (error) {
+                return response.status(404).json(error.message);
             } else if (!user) {
-                var errMessage = 'Username or Password incorrect'
+                var errMessage = 'Username incorrect'
                 return response.status(404).json(errMessage);
-            } 
-            response.json(user);
+            } else {
+                bcrypt.compare(request.body.password, user.password, function(err, res) {
+                    if (err) {
+                       return response.status(404).json(err.message);
+                    } else if (!res) {
+                        var errMessage = 'Password incorrect'
+                        return response.status(404).json(errMessage);
+                    }
+                    var options = { algorithm: 'HS256', expiresIn: '2m' };            
+                    token = jwt.sign({ id:user.id, password:user.password }, secret, options);
+                    response.json({ user:user,token:token });
+                });
+                
+            }
         })
     })
+
+router.use(function(request, response, next) {
+    var token = request.body.token || request.query.token || request.headers['x-access-token'];
+    
+    if (token) {        
+        jwt.verify(token, secret, function(err, decoded) {      
+            if (err) {
+                if (err.name == 'TokenExpiredError') {
+                    return response.status(401).json(err);                              
+                } 
+                return response.status(400).json(err);
+            } else {
+                request.decoded = decoded;    
+                next();
+            }
+        });  
+    } else {
+        return response.status(403).send({ 
+            message: 'No token provided.' 
+        });
+    }
+})
 
 router.route('/users')
     .get(function(request, response) {
@@ -309,80 +336,3 @@ router.route('/next_question')
 function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-
-
-
-
-
-
-
-// USERS
-router.route('/quiz_create')
-.post(function(request, response) {
-    var quiz = new Quiz(request.body);
-    quiz.save(function(err) {
-        if (err) {
-           return response.status(404).json(err.message);
-        }
-        
-        if (quiz.mode == 'Categorized') {
-            Topic.find().populate('author'). exec(function (err, topics) {
-                if (err) {
-                 return response.status(404).json(err);
-                } 
-                response.json({ "quiz": quiz,"categories": topics});
-             })
-        } else {
-            response.json(quiz);
-        }
-    })
-})
-
-router.route('/quiz_start')
-.post(function(request, response) {
-    var user = User.findOne({ userName:request.body.userName, password:request.body.password }, function(err, user) {
-        if (err) {
-            return response.status(404).json(err.message);
-        }  
-        response.json(user);
-    })
-})
-
-router.route('/users')
-.get(function(request, response) {
-    User.find(function(err, users) {
-       if (err) {
-        return response.status(404).json(err);
-       } 
-       response.json(users);
-    })
-})
-
-router.route('/users/:id')
-.get(function(request, response) {
-    User.findById(request.params.id, function(err, user) {
-        if (err) {
-            return response.status(404).json(error);
-        }
-        response.json(user);
-    })
-})
-
-.put(function(request, response) {
-    User.findByIdAndUpdate(request.params.id, request.body,{new: true}, function(err, user) {
-        if (err) {
-            return response.status(404).json(error);
-        }
-        response.json(user);
-    })
-})
-
-.delete(function(request, response) {
-    User.findByIdAndRemove(request.params.id, function(err) {
-        if (err) {
-            return response.status(404).json(err);
-        } 
-        response.json({ message: 'user successfully deleted' });
-    })
-})

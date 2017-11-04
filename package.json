@@ -31,6 +31,7 @@
     "node-geocoder": "",
     "mongoose-unique-validator": "",
     "multer": "",
-    "jsonwebtoken": ""
+    "jsonwebtoken": "",
+    "bcrypt": ""
   }
 }

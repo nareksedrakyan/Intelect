@@ -1,6 +1,7 @@
 var mongoose = require('mongoose');
 var uniqueValidator = require('mongoose-unique-validator');
 
+
 var LocationSchema = require('./schemas/locationSchema');
 var Schema = mongoose.Schema;
 var POSITIONS = ['Beginner','Novice','Advanced','Expert','Master','Genius'];
@@ -14,7 +15,7 @@ var userSchema = new Schema({
     userName:           { type: String, required: true, unique: true },
     email:              { type: String, required: true, unique: true },
     displayName:        { type: String, required: true },
-    password:           { type: String, required: true , select: false },
+    password:           { type: String, required: true },
     location:           { type: LocationSchema, required: true },
     gold:               { type: Number, default: 100 },
     totalRating:        { type: Number, default: 0 },
@@ -38,7 +39,7 @@ userSchema.virtual('id')
 userSchema.set('toJSON', {
     virtuals: true,
     versionKey:false,
-    transform: function (doc, ret) { delete ret._id  }
+    transform: function (doc, ret) { delete ret._id; delete ret.password }
 });
 
 userSchema.plugin(uniqueValidator);
