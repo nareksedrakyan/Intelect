@@ -9,21 +9,37 @@ var Question = require('../models/question');
 var Topic = require('../models/topic');
 var Quiz = require('../models/gameModels/quiz');
 var jwt = require('jsonwebtoken');   
-var bcrypt = require('bcrypt');     
+var bcrypt = require('bcrypt'); 
+var format = require('util').format;    
 var secret = 'secret';
+var Storage = require('@google-cloud/storage');
+var storage = Storage();
 
 var NodeGeocoder = require('node-geocoder');
-var multer  = require('multer')
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, './uploads')
-    },
-    filename: function (req, file, cb) {
-      cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
-    }
-  })
+var Multer  = require('multer')
+
+var publicRequest = require('request');
+
+// var storage = Multer.diskStorage({
+//     destination: function (req, file, cb) {
+//       cb(null, './uploads')
+//     },
+//     filename: function (req, file, cb) {
+//       cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+//     }
+//   })
   
-  var upload = multer({ storage: storage })
+//   var upload = multer({ storage: storage })
+
+const multer = Multer({
+    storage: Multer.MemoryStorage,
+    limits: {
+      fileSize: 5 * 1024 * 1024 // no larger than 5mb
+    }
+  });
+
+
+
 
 var options = {
  provider: 'google'
@@ -50,14 +66,18 @@ router.get('/', function(request, response) {
 
 //Upload
 
-router.route('/avatar')
-    .post(upload.single('image'),function(request, response) {
-        console.log(request.file, 'files');
+// router.route('/avatar')
+//     .post(upload.single('image'),function(request, response) {
+//         console.log(request.file, 'files');
 
-        response.json("success");
-    });
+//         response.json("success");
+//     });
+
 
 // USERS
+
+
+
 router.route('/users/signup')
     .post(function(request, response) {
         var user = new User({
@@ -131,18 +151,17 @@ router.route('/users/signin')
                         var errMessage = 'Password incorrect'
                         return response.status(404).json(errMessage);
                     }
-                    var options = { algorithm: 'HS256', expiresIn: '2m' };            
+                    var options = { algorithm: 'HS256', expiresIn: '2d' };            
                     token = jwt.sign({ id:user.id, password:user.password }, secret, options);
                     response.json({ user:user,token:token });
                 });
-                
             }
         })
     })
 
+
 router.use(function(request, response, next) {
     var token = request.body.token || request.query.token || request.headers['x-access-token'];
-    
     if (token) {        
         jwt.verify(token, secret, function(err, decoded) {      
             if (err) {
@@ -161,6 +180,63 @@ router.use(function(request, response, next) {
         });
     }
 })
+
+//UPLOAD
+
+router.route('/upload')
+    .post(multer.single('image'),function(request, response) {
+        if (!request.file) {
+            response.status(400).json('No file uploaded.');
+            return;
+        }
+
+        var bucketName = process.env.GCLOUD_STORAGE_BUCKET || 'intelect-184208';
+        const bucket = storage.bucket(bucketName);
+
+        const blob = bucket.file(request.file.fieldname + '-' + Date.now() + path.extname(request.file.originalname));
+        const blobStream = blob.createWriteStream();
+
+        getUserById(request.decoded.id,function(err, user) {
+            if(!err && user.photoUrl) {
+                var fileName = user.photoUrl.substring(user.photoUrl.lastIndexOf('/')+1); 
+
+                publicRequest({
+                            method:'DELETE',
+                            url:'https://www.googleapis.com/storage/v1/b/' + bucketName + '/o/' + fileName
+                            //,headers: { "x-goog-project-id": '373721231653' }
+                        },
+                function (err, res, body) {  
+                    console.log(body);  
+                 }) 
+            }
+
+            blobStream.on('error', (err) => {
+                response.status(400).json(err.message);
+            });
+            
+            blobStream.on('finish', () => {
+                // The public URL can be used to directly access the file via HTTP.
+                const publicUrl = 'https://storage.googleapis.com/' + bucketName + '/' + blob.name;
+                response.json(publicUrl)
+                user.photoUrl = publicUrl;
+                user.save();
+            });
+            
+            blobStream.end(request.file.buffer);
+
+        })
+        
+       
+});
+
+function getUserById(id, cb) {
+    User.findById(id, function(err, user) {
+        if (err) {
+            return cb(err, null);
+        }
+        cb(null, user);
+    })
+}
 
 router.route('/users')
     .get(function(request, response) {

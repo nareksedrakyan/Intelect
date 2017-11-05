@@ -28,8 +28,7 @@ var userSchema = new Schema({
     online:             { type: Boolean, default: false },
     lastActive:         { type: String },
     createdAt:          { type: String },
-    updatedAt:          { type: String },
-    accessToken:        { type: String, default: null }
+    updatedAt:          { type: String }
 })
 
 userSchema.virtual('id')
@@ -39,7 +38,7 @@ userSchema.virtual('id')
 userSchema.set('toJSON', {
     virtuals: true,
     versionKey:false,
-    transform: function (doc, ret) { delete ret._id; delete ret.password }
+    transform: function (doc, ret) { delete ret._id }
 });
 
 userSchema.plugin(uniqueValidator);

@@ -32,6 +32,8 @@
     "mongoose-unique-validator": "",
     "multer": "",
     "jsonwebtoken": "",
-    "bcrypt": ""
+    "bcrypt": "",
+    "request": ""
+    
   }
 }
