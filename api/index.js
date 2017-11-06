@@ -207,23 +207,12 @@ router.route('/upload')
                 file.delete(function(err, apiResponse) {
                     console.log('deleted successfully');
                 });
-
-                // publicRequest({
-                //             method:'DELETE',
-                //             url:'https://www.googleapis.com/storage/v1/b/' + bucketName + '/o/' + fileName
-                //             ,headers: { "Authorization": key.private_key }
-                //         },
-                // function (err, res, body) {  
-                //     console.log(body);  
-                //  }) 
-            }
-
+            };
             blobStream.on('error', (err) => {
                 response.status(400).json(err.message);
             });
             
             blobStream.on('finish', () => {
-                // The public URL can be used to directly access the file via HTTP.
                 const publicUrl = 'https://storage.googleapis.com/' + bucketName + '/' + blob.name;
                 response.json(publicUrl)
                 user.photoUrl = publicUrl;
