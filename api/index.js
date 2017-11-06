@@ -13,8 +13,12 @@ var bcrypt = require('bcrypt');
 var format = require('util').format;    
 var secret = 'secret';
 var Storage = require('@google-cloud/storage');
-var storage = Storage();
+var googleStoragekeys = require('../keyfile');
 
+var storage = Storage({
+    projectId: googleStoragekeys.project_id,
+    keyFilename: path.join(__dirname,'/../keyfile.json')
+});
 var NodeGeocoder = require('node-geocoder');
 var Multer  = require('multer')
 
@@ -199,15 +203,19 @@ router.route('/upload')
         getUserById(request.decoded.id,function(err, user) {
             if(!err && user.photoUrl) {
                 var fileName = user.photoUrl.substring(user.photoUrl.lastIndexOf('/')+1); 
+                var file = bucket.file(fileName);
+                file.delete(function(err, apiResponse) {
+                    console.log('deleted successfully');
+                });
 
-                publicRequest({
-                            method:'DELETE',
-                            url:'https://www.googleapis.com/storage/v1/b/' + bucketName + '/o/' + fileName
-                            //,headers: { "x-goog-project-id": '373721231653' }
-                        },
-                function (err, res, body) {  
-                    console.log(body);  
-                 }) 
+                // publicRequest({
+                //             method:'DELETE',
+                //             url:'https://www.googleapis.com/storage/v1/b/' + bucketName + '/o/' + fileName
+                //             ,headers: { "Authorization": key.private_key }
+                //         },
+                // function (err, res, body) {  
+                //     console.log(body);  
+                //  }) 
             }
 
             blobStream.on('error', (err) => {
