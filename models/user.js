@@ -11,6 +11,13 @@ var RatingSchema = new Schema({
     rating:   { type: Number, default: 0 }
 },{ _id: false, versionKey: false })
 
+var VictorySchema = new Schema({
+    topic:    { type: Schema.Types.ObjectId , ref: "Topic" },
+    place:    { type: Number, min: 1, max: 10 },
+    region:   { type: String },
+    mounth:   { type: Number, min: 1, max: 12 },  
+},{ _id: false, versionKey: false })
+
 var userSchema = new Schema({
     userName:           { type: String, required: true, unique: true },
     email:              { type: String, required: true, unique: true },
@@ -21,8 +28,12 @@ var userSchema = new Schema({
     totalRating:        { type: Number, default: 0 },
     position:           { type: String, enum: POSITIONS, default: 'Beginner'},
     photoUrl:           { type: String },
-    questionIds:        { type: [Schema.Types.ObjectId] , default: [] },
+    questions:          { type: [ { type: Schema.Types.ObjectId, ref: "Question" } ] , default: [] },
     ratings:            { type: [RatingSchema], default: [] },
+    duels:              { type: [ { type: Schema.Types.ObjectId, ref: "Duel" } ] , default: [] },
+    followers:          { type: [ { type: Schema.Types.ObjectId, ref: "User" } ] , default: [] },
+    following:          { type: [ { type: Schema.Types.ObjectId, ref: "User" } ] , default: [] },
+    victories:          { type: [VictorySchema], default: [] },
     admin:              { type: Boolean, default: false },
     vip:                { type: Boolean, default: false },
     online:             { type: Boolean, default: false },

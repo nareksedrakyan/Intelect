@@ -194,7 +194,7 @@ router.route('/upload')
             return;
         }
 
-        var bucketName = process.env.GCLOUD_STORAGE_BUCKET || 'intelect-184208';
+        var bucketName = process.env.GCLOUD_STORAGE_BUCKET || googleStoragekeys.project_id;
         const bucket = storage.bucket(bucketName);
 
         const blob = bucket.file(request.file.fieldname + '-' + Date.now() + path.extname(request.file.originalname));
