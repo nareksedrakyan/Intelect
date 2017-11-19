@@ -14,7 +14,6 @@ var format = require('util').format;
 var secret = 'secret';
 var Storage = require('@google-cloud/storage');
 var googleStoragekeys = require('../keyfile');
-var BASE_URL = 'https://intelect-184208.appspot.com';
 var storage = Storage({
     projectId: googleStoragekeys.project_id,
     keyFilename: path.join(__dirname,'/../keyfile.json')
@@ -44,8 +43,6 @@ const multer = Multer({
   });
 
 
-
-
 var options = {
  provider: 'google'
 };
@@ -53,7 +50,7 @@ var geocoder = NodeGeocoder(options);
 
 var router = express.Router(); 
 var app = express();
-
+app.enable('trust proxy');
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
