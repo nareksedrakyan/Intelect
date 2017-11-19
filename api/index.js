@@ -14,7 +14,7 @@ var format = require('util').format;
 var secret = 'secret';
 var Storage = require('@google-cloud/storage');
 var googleStoragekeys = require('../keyfile');
-
+var BASE_URL = 'https://intelect-184208.appspot.com';
 var storage = Storage({
     projectId: googleStoragekeys.project_id,
     keyFilename: path.join(__dirname,'/../keyfile.json')
@@ -23,6 +23,7 @@ var NodeGeocoder = require('node-geocoder');
 var Multer  = require('multer')
 
 var publicRequest = require('request');
+
 
 // var storage = Multer.diskStorage({
 //     destination: function (req, file, cb) {
@@ -103,6 +104,7 @@ router.route('/users/signup')
                 user.location.countryCode = res[0].countryCode;
                 user.location.city = res[0].city;      
                 user.location.zipcode = res[0].zipcode;
+                user.countryPhotoUrl = request.protocol + '://' + request.get('host') + '/img/countries/' + user.location.countryCode + '.png';
                 sendRegisteredUser(user,response);
               });
         } else {

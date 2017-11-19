@@ -28,6 +28,7 @@ var userSchema = new Schema({
     totalRating:        { type: Number, default: 0 },
     position:           { type: String, enum: POSITIONS, default: 'Beginner'},
     photoUrl:           { type: String },
+    countryPhotoUrl:    { type: String },
     questions:          { type: [ { type: Schema.Types.ObjectId, ref: "Question" } ] , default: [] },
     ratings:            { type: [RatingSchema], default: [] },
     duels:              { type: [ { type: Schema.Types.ObjectId, ref: "Duel" } ] , default: [] },
